@@ -4,6 +4,8 @@
             [compojure.route :as route]))
 
 (defroutes app-routes
+	(GET "/" []
+    (str "COUNTEM"))
   (GET "/user/:id" [id]
   	(str "Hello user " id))
   (route/not-found "Not Found"))
