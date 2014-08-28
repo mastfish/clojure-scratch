@@ -7,11 +7,14 @@
 
 (defn input [] (client/get "http://search-service.production.dbg.westfield.com/api/search/master/search.json?centre=sydney&term=co"))
 (defn json [] (parse-string (:body (input))))
-(defn result [] (json))
+(defn results [] ((json) "results"))
+(defn products [] ((results) "products"))
+(defn score [input] (get input "score"))
+(defn score_total [] (reduce + (map score (products))))
 
 (defroutes app-routes
 	(GET "/" []
-    (generate-string (result)))
+    (generate-string (score_total)))
   (GET "/user/:id" [id]
   	(str "Hello user " id))
   (route/not-found "Not Found"))
