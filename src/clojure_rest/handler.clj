@@ -8,9 +8,12 @@
 (defn input [] (client/get "http://search-service.production.dbg.westfield.com/api/search/master/search.json?centre=sydney&term=co"))
 (defn json [] (parse-string (:body (input))))
 (defn results [] ((json) "results"))
-(defn products [] ((results) "products"))
 (defn score [input] (get input "score"))
-(defn score_total [] (reduce + (map score (products))))
+; in pseudo code:
+; Find all keys
+; concat ((results) "keyname")
+(defn flat_results [] (concat ((results) "products") ((results) "stores") ((results) "events")))
+(defn score_total [] (reduce + (map score (flat_results))))
 
 (defroutes app-routes
 	(GET "/" []
