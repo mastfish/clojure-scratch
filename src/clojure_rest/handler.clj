@@ -20,7 +20,7 @@
 	(GET "/" []
     (generate-string (score_total)))
   (GET "/search/:search" [search]
-    (generate-string(score_total (flat_results (results (json (input search)))))))
+    (generate-string (hash-map :score_total (score_total (flat_results (results (json (input search))))))))
   (route/not-found "Not Found"))
 
 (def app
