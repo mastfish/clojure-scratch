@@ -5,18 +5,22 @@
             [clj-http.client :as client]
             [cheshire.core :refer :all]))
 
-(defn input [] (client/get "http://search-service.production.dbg.westfield.com/api/search/master/search.json?centre=sydney&term=wid"))
-(defn json [] (parse-string (:body (input))))
-(def results ((json) "results"))
-(defn score [input] (get input "score"))
-(defn flat_results [] (reduce concat(map results (keys results))))
-(defn score_total [] (reduce + (map score (flat_results))))
+(defn input [search] (
+  client/get (
+    str "http://search-service.production.dbg.westfield.com/api/search/master/search.json?centre=sydney&term=" search)))
+; wid = -324
+(defn json [data] (parse-string (data :body)))
+(defn results [data] (get data "results"))
+(defn flat_results [data] (reduce concat(map data (keys data))))
+(defn score_total [data] (reduce + (map score data)))
+; Map functions
+(defn score [data] (get data "score"))
 
 (defroutes app-routes
 	(GET "/" []
     (generate-string (score_total)))
-  (GET "/user/:id" [id]
-  	(str "Hello user " id))
+  (GET "/search/:search" [search]
+    (generate-string(score_total (flat_results (results (json (input search)))))))
   (route/not-found "Not Found"))
 
 (def app
